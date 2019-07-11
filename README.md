@@ -13,5 +13,5 @@ The necessary libraries are attached to this repository.
 The Hardware PCB was designed in Eagle 9.4.2, and the gerber files are attached to this repository.
 
 The Schematic
+![Schematic_Hydroponic](Schematic_Hydroponic.png) 
 
-https://github.com/NorberMV/Hydroponics_tech/blob/master/Schematic_Hydroponic.png
