@@ -9,3 +9,4 @@
   * Authors: Norberto Moreno Vélez, Julian Quiceno
   * Date: 06/26/2019
    * /
+The necessary libraries are attached to this repository.
