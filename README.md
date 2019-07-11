@@ -1,6 +1,6 @@
 # Hydroponics_tech
 *C++ sketch that allows control a pump by setting a timer in a hydroponic system with the Nutrient Film Technique.
-  ## Description: 
+  # Description: 
   * This sketch allows the user to select between several default time modes for
   * the drive of the motor pump, in a hydroponic system. Interacts with the arduino driver hardware
   * nano CH340, lcd I2C 16x2 and the clock module RTC DS3231. Modified part of the code "Time Clock Test
