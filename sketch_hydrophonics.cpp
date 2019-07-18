@@ -58,7 +58,7 @@ void setup () {
   lcd.backlight();
   lcd.clear();
   lcd.setCursor(2,0);
-  lcd.print("Sistema riego");
+  lcd.print("Sistema");
   lcd.setCursor(3,1);
   lcd.print("Hidroponia");
   delay(3000);
@@ -66,7 +66,7 @@ void setup () {
 
  // Pantallazo 1
   lcd.setCursor(4,0);
-  lcd.print("Elija el modo de riego...");
+  lcd.print("Elija el modo de control...");
   for (int positionCounter = 0; positionCounter < 23; positionCounter++) {
     
   // scroll one position left:
@@ -82,7 +82,7 @@ void setup () {
   lcd.clear();
 
 
-//Inicio selección de modo de riego
+//Inicio selección de modo de Control bomba
 
   do{
     int set_state = digitalRead(pulsador_set);
@@ -92,10 +92,10 @@ void setup () {
       contador_set++;
       delay(400);
     }
-    else if (contador_set == 1) {
+    else if (contador_set == 1) {  // Modo de control establecido desde pantalla por el usuario
       lcd.clear();
       lcd.setCursor(4,0);
-      lcd.print("1.Riego");
+      lcd.print("1.Bombeo");
       lcd.setCursor(3,1);
       lcd.print("programado.");
       flag_modo = 1;
@@ -103,14 +103,14 @@ void setup () {
         lcd.clear();
         break;
         }
-      delay(200);
+      delay(200); // Delay sensibilidad ajustada de pulsador
     }
-    else if (contador_set == 2) {
+    else if (contador_set == 2) {     // Modo de control preestablecido hidroponia aprendido en el curso
       lcd.clear();
       lcd.setCursor(0,0);
-      lcd.print(" 2.Riego 15 min,");
+      lcd.print("  2.Hydroponic  ");
       lcd.setCursor(3,1);
-      lcd.print("cada hora.");
+      lcd.print("   beta test.   ");
       flag_modo = 2;
     
       if (pulsador_select_state == false) {
@@ -234,7 +234,7 @@ do{
 
 //lcd.clear();
 lcd.setCursor(4,0);
-lcd.print("Inicio de ciclo de riego...");
+lcd.print("Inicio de ciclo...");
 for (int positionCounter = 0; positionCounter < 16; positionCounter++) {
   // scroll one position left:
   lcd.scrollDisplayLeft();
@@ -300,6 +300,7 @@ DateTime diferencia_minuto;
 DateTime t1;
 DateTime actual = tiempo_real();
 
+ // Condicional modo de control establecido desde pantalla
 if ((contador_horas - contador_horas_fin) == 0 && flag_modo == 3) {
   if (actual.minute() >= contador_min && actual.minute() < contador_min_fin) {
     digitalWrite(rele,HIGH);
@@ -331,25 +332,34 @@ else if (now.hour() >= contador_horas && now.hour() < contador_horas_fin) {  // 
   }
   
 }*/
-
-else if (flag_modo == 2) {   //Modo riego 15 minutos cada hora
+// Modo de control preestablecido para hidroponía según curso
+else if (flag_modo == 2) {   // Modo riego 15 minutos cada hora
   if (contador_mod2 == 0) { // Si contador modo de riego 2 está en cero
     minuto_referencia = actual.minute(); //Minuto de referencia para comparación
     contador_mod2++;
   }
   else if (contador_mod2 != 0) {
-    //t1 = fecha_referencia + TimeSpan(0,0,15,0); //diferencia_minuto = (now.minute() - minuto_referencia); si le añado 15 minutos a la fecha de referencia entonces...
-    //if (actual.minute() - minuto_referencia == 0){
-      if ( actual.minute() >=0 && actual.minute() < 15) {
-        digitalWrite(rele,HIGH);
-        //contador_serial++;
-        Serial.println(contador_serial);
+   if ( actual.hour() >=7 && actual.hour() < 11) {
+    if (actual.minute() >=0 && actual.minute() < 15) {
+     digitalWrite(rele,HIGH);
+     }
+    else if (actual.minute() >=15) {
+     digital.Write(rele,LOW);
+     }
+   }
+   else if (actual.hour()>= 11 && actual.hour() < 14) {
+    if (actual.minute() >=0 && actual.minute() <15) {
+     digitalWrite(rele,HIGH);
+     }
+    else if (actual.minute() >= 30 && actual.minute() < 45) {
+     digital.Write(rele,LOW);          
     }
-    else if (actual.minute()>= 15) {
-      digitalWrite(rele,LOW);
+    else if (actual.minute() >=45 && actual.minute() <=59) {
+     digital.Write(rele,HIGH);
     }
+   }
   }
-}
+} // Fin flag_modo2 
 
 else {
   digitalWrite(rele,LOW);
