@@ -21,12 +21,10 @@ LiquidCrystal_I2C lcd(0x27,16,2);
 RTC_DS1307 RTC;
 
 // Entradas digitales
-int rele = 3;
+int rele = 2;
 int pulsador_hora = 2;
 int pulsador_min = 4;
 int pulsador_set = 5;
-int pulsador_hora_menos =6;
-int pulsador_min_menos = 7;
 
  // Contadores
 int contador_horas =0;
@@ -82,36 +80,36 @@ void setup () {
   lcd.clear();
 
 
-//Inicio selección de modo de Control bomba
+// *>*INICIO MENÚ DE SELECCIÓN TIPO DE CONTROL DE BOMBA*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   do{
     int set_state = digitalRead(pulsador_set);
     int pulsador_select_state = digitalRead(pulsador_hora);
-    // int pulsador_set_state = set_state(contador_set);
+
     if (set_state == false) {
       contador_set++;
       delay(400);
     }
-    else if (contador_set == 1) {  // Modo de control establecido desde pantalla por el usuario
+    else if (contador_set == 1) {                          // Modo de control establecido desde pantalla por el usuario
       lcd.clear();
       lcd.setCursor(4,0);
       lcd.print("1.Bombeo");
       lcd.setCursor(3,1);
       lcd.print("programado.");
-      flag_modo = 1;
+      flag_modo = 1;                                      // Bandera modo bombeo programado
       if (pulsador_select_state == false) {
         lcd.clear();
         break;
         }
-      delay(200); // Delay sensibilidad ajustada de pulsador
+      delay(200);                                         // Delay sensibilidad ajustada para el pulsador
     }
-    else if (contador_set == 2) {     // Modo de control preestablecido hidroponia aprendido en el curso
+    else if (contador_set == 2) {                         // Modo de control preestablecido hidroponia aprendido en el curso
       lcd.clear();
       lcd.setCursor(0,0);
       lcd.print("  2.Hydroponic  ");
       lcd.setCursor(3,1);
       lcd.print("   beta test.   ");
-      flag_modo = 2;
+      flag_modo = 2;                                     // Bandera modo bombeo preestablecido en el curso
     
       if (pulsador_select_state == false) {
         lcd.clear();
@@ -120,35 +118,33 @@ void setup () {
       delay(200);
     }
     
- /* else if (pulsador_set_state == 3) {
+ /* else if (pulsador_set_state == 3) {                    Adicionar futuros controles en el menú
   *  lcd.clear();
     lcd.print("3.Riego 30 min, cada hora.");
   }*/
   
   else if (contador_set > 2) {
-    contador_set = 1; // Reseteo el contador del set para volver a la opción 1
+   contador_set = 1;                                    // Reseteo el contador del set para volver a la opción 1
   }
   else {
-    //lcd.clear();
-    lcd.setCursor(0,0);
-    lcd.print("Pulsar set para"); // Poner a circular
-    lcd.setCursor(0,1);
-    lcd.print("seleccionar modo...");
-    flag_modo = 0;
-    delay(200);
+   lcd.setCursor(0,0);
+   lcd.print("Pulsar set para"); 
+   lcd.setCursor(0,1);
+   lcd.print("seleccionar modo...");
+   flag_modo = 0;
+   delay(200);
   }
-  //delay(300);
+  
 }while (true); // Fin selección modo de riego
 
 
-// Set de selección riego programado
+// *>>>*Set de selección riego programado*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+ 
   do{
     int state_pul_hora = digitalRead(pulsador_hora);
     int state_pul_min = digitalRead(pulsador_min);
     int state_pul_set = digitalRead(pulsador_set);
-    int state_pul_hora_menos = digitalRead(pulsador_hora_menos);
-    int state_pul_min_menos = digitalRead(pulsador_min_menos);
-  
+      
   
     if (state_pul_hora == false) {
       contador_horas++;
@@ -157,10 +153,7 @@ void setup () {
       }
       delay(200);
     }
-    //else if (state_pul_hora_menos == false) {
-     // contador_horas--;
-     // delay(200);
-    //}
+    
     else if (state_pul_min == false) {
       contador_min++;
       if (contador_min >59) {
@@ -168,10 +161,7 @@ void setup () {
       }
       delay(200);
     }
-    //else if (state_pul_min_menos == false) {
-     // contador_min--;
-     // delay(200);
-    //}
+    
     else if (state_pul_set == false) {
       flag_modo = 3;
       lcd.clear();
@@ -179,7 +169,7 @@ void setup () {
       break;
     }
     lcd.setCursor(0,0);
-    lcd.print("INICIO RIEGO 1: ");
+    lcd.print("INICIO BOMBEO 1:");
     lcd.setCursor(6,1);
     lcd.print(contador_horas);
     lcd.print(":");
@@ -188,15 +178,12 @@ void setup () {
   }while(flag_modo == 1);
 
 
-// Set de configuración FINAL DE RIEGO 1
+//*>>>Set de configuración FINAL DE RIEGO 1*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 do{
   int state_pul_hora = digitalRead(pulsador_hora);
   int state_pul_min = digitalRead(pulsador_min);
   int state_pul_set = digitalRead(pulsador_set);
-  int state_pul_hora_menos = digitalRead(pulsador_hora_menos);
-  int state_pul_min_menos = digitalRead(pulsador_min_menos);
-  
-  
+    
   if (state_pul_hora == false) {
     contador_horas_fin++;
     if (contador_horas_fin >23) {
@@ -204,10 +191,7 @@ do{
     }
     delay(200);
   }
-  //else if (state_pul_hora_menos == false) {
-   // contador_horas_fin--;
-    //delay(200);
- // }
+  
   else if (state_pul_min == false) {
     contador_min_fin++;
     if ( contador_min_fin > 59) {
@@ -215,16 +199,13 @@ do{
     }
     delay(200);
   }
-  //else if (state_pul_min_menos == false) {
-    //  contador_min_fin--;
-      //delay(200);
-    //}
+  
   else if (state_pul_set == false) {
     lcd.clear();
     break;
   }
   lcd.setCursor(0,0);
-  lcd.print("FINAL RIEGO 1: ");
+  lcd.print("FINAL BOMBEO 1: ");
   lcd.setCursor(6,1);
   lcd.print(contador_horas_fin);
   lcd.print(":");
@@ -232,7 +213,7 @@ do{
   
 }while(flag_modo == 3);
 
-//lcd.clear();
+
 lcd.setCursor(4,0);
 lcd.print("Inicio de ciclo...");
 for (int positionCounter = 0; positionCounter < 16; positionCounter++) {
@@ -248,7 +229,7 @@ lcd.clear();
 }
 
 
-// *Función de tiempo real: Devuelve un dato de tipo DateTime
+// *Función de tiempo real By ElNorberMix: Devuelve un dato de tipo DateTime
 
 DateTime tiempo_real() {
   
@@ -295,9 +276,9 @@ DateTime tiempo_real() {
 
 void loop(){
 
-DateTime minuto_referencia;
-DateTime diferencia_minuto;
-DateTime t1;
+//DateTime minuto_referencia;
+//DateTime diferencia_minuto;
+//DateTime t1;
 DateTime actual = tiempo_real();
 
  // Condicional modo de control establecido desde pantalla
@@ -310,28 +291,7 @@ if ((contador_horas - contador_horas_fin) == 0 && flag_modo == 3) {
   }
   
 }
-/*
-// Cuando se activa el riego mas de una hora
-if ((contador_horas - contador_horas_fin) != 0 ) {
-  int diferencia_en_min = ((contador_horas_fin - now.hour())*60)+(contador_min_fin- now.minute()); // Tiempo en horas conversion a minutos
-  if (now.hour() >= contador_horas && now.hour() < contador_horas_fin) {
-    if (diferencia_en_min <= contador_min && diferencia_horas contador_min_fin) { // Mala logica
-      digitalWrite(rele,HIGH);
-    }
-    
-  }
-  else if (now.minute() >= contador_min_fin) {
-    digitalWrite(rele,LOW);
-  }
-  
-}
-/*
-else if (now.hour() >= contador_horas && now.hour() < contador_horas_fin) {  // Hora programada
-  if (now.minute() >= contador_min && now.minute() < contador_min_fin) {
-    digitalWrite(rele,HIGH);
-  }
-  
-}*/
+
 // Modo de control preestablecido para hidroponía según curso
 else if (flag_modo == 2) {   // Modo riego 15 minutos cada hora
   if (contador_mod2 == 0) { // Si contador modo de riego 2 está en cero
