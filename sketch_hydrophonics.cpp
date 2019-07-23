@@ -1,5 +1,3 @@
-
-
 /* Titulo : SISTEMA HIDROPONÍA
  *  Descripción: Este sketch permite al usuario seleccionar entre varios modos de tiempos predeterminados para 
  *  el accionamiento de la motobomba, en un sistema hidropónico. Interactúa con el hardware controlador arduino
@@ -13,16 +11,18 @@
 // Conexion RTC :Arduino UNO    GND->GND VCC->5V SCL-> SCL  SDA->SDA los dos pines despues del ...12,13,GND,AREF,SDA,SCL
 // NOTA: se debe cargar dos veces este programa 1.Con la linea 9= RTC.adjust(DateTime(__DATE__, __TIME__));
 //                                              2. Sin esa linea
-
+#include <Adafruit_NeoPixel.h> // Neopixels
 #include <Wire.h> 
 #include "RTClib.h"
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27,16,2);
 RTC_DS1307 RTC;
-
+#define PIN            6    // Neopixels
+#define NUMPIXELS      8     //Neopixels
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);  //Neopixels
 // Entradas digitales
 int rele = 2;
-int pulsador_hora = 2;
+int pulsador_hora = 3;
 int pulsador_min = 4;
 int pulsador_set = 5;
 
@@ -39,6 +39,7 @@ int flag_modo;
 
 
 void setup () {
+  pixels.begin(); // This initializes the NeoPixel library.
   Wire.begin(); // Inicia el puerto I2C
   RTC.begin(); // Inicia la comunicaci¢n con el RTC
 //RTC.adjust(DateTime(__DATE__, __TIME__)); // Establece la fecha y hora (Comentar una vez establecida la hora)
@@ -48,8 +49,6 @@ void setup () {
   pinMode(pulsador_hora,INPUT_PULLUP);
   pinMode(pulsador_min,INPUT_PULLUP);
   pinMode(pulsador_set,INPUT_PULLUP);
-  pinMode(pulsador_hora_menos,INPUT_PULLUP);
-  pinMode(pulsador_min_menos,INPUT_PULLUP);
   digitalWrite(rele,LOW);
 
   lcd.init();
@@ -213,7 +212,7 @@ do{
   
 }while(flag_modo == 3);
 
-
+lcd.clear();
 lcd.setCursor(4,0);
 lcd.print("Inicio de ciclo...");
 for (int positionCounter = 0; positionCounter < 16; positionCounter++) {
@@ -274,12 +273,133 @@ DateTime tiempo_real() {
   return now;
 }
 
+/* FUNCIÓN hydroponicTest(); 
+ *  Función con ciclos predeterminados de bombeo especiales para hidroponía así: 
+   * 7:00AM - 11:00AM : Ciclos de bombeo de 15 minutos cada hora,"comenzando desde el minuto 0"
+   * 11:00AM - 14:00AM: Cilclos de bombeo alternados cada 15 minutos, "encendiendo la bomba desde el minuto 0"
+   * 14:00PM - 17:00PM: CIclos de bombeo de 15 minutos cada hora, "comenzando desde el minuto 0" */
+   
+void hydroponicTest() {
+  
+  DateTime actual = RTC.now();                 // Obtiene la fecha y hora del RTC
+  
+  if ( actual.hour() >=7 && actual.hour() < 11) {                   // De las 7AM  a las 11AM
+    if (actual.minute() >=0 && actual.minute() < 15) {
+      digitalWrite(rele,HIGH);
+      lcd.setCursor(4,0);
+      lcd.print("Bombeando");
+      lcd.setCursor(0,1);
+      lcd.print("       ...   ");
+      delay(1000);
+      naranja();
+     }
+    else if (actual.minute() >=15) {
+     digitalWrite(rele,LOW);
+     shutDown();
+     }
+   }
+  else if (actual.hour()>= 11 && actual.hour() < 14) {            // De las 11AM  a las 14PM Falto el rango desde las 11:15 a las 11:30 LOW  
+    if (actual.minute() >=0 && actual.minute() <15) {
+     digitalWrite(rele,HIGH);
+     lcd.setCursor(4,0);
+     lcd.print("Bombeando");
+     lcd.setCursor(0,1);
+     lcd.print("       ...   ");
+     delay(1000);
+     naranja();
+     }
+    else if (actual.minute() >= 15 && actual.minute() < 30) {
+     digitalWrite(rele,LOW); 
+     shutDown();         
+    }
+    else if (actual.minute() >=30 && actual.minute() <45) {
+     digitalWrite(rele,HIGH);
+     lcd.setCursor(4,0);
+     lcd.print("Bombeando");
+     lcd.setCursor(0,1);
+     lcd.print("       ...   ");
+     delay(1000);
+     naranja();
+    }
+    else if (actual.minute() <= 45 && actual.minute() <= 59) {
+      digitalWrite(rele,LOW);
+      shutDown();
+    }
+   }
+  else if (actual.hour()>= 14 && actual.hour() <   21) {           // De las 14PM a las 17PM
+    if (actual.minute() >=0 && actual.minute() <15) {
+      digitalWrite(rele,HIGH);
+      lcd.setCursor(4,0);
+      lcd.print("Bombeando");
+      lcd.setCursor(0,1);
+      lcd.print("       ...   ");
+      delay(1000);
+      naranja();
+    }
+    else if (actual.minute() >= 15) {
+      digitalWrite(rele,LOW);
+      shutDown(); 
+    }
+    
+   }                                                             // Fin ciclo de la tarde hasta las 17PM
+   
+  else if (actual.hour() >21 ) {                                // Apaga la bomba despues de las 17PM
+    digitalWrite(rele,LOW);         
+   }
+   
+   return 0;
+}  // Fin de la función
+
+
+//Función para cambiar los pixels matizandolos de rojo a naranja
+ void naranja() {                        
+  for(int i=0; i!=60; i++) {
+    pixels.setPixelColor(1,255,i,0);
+    pixels.setPixelColor(2,255,i,0);
+    pixels.setPixelColor(3,255,i,0);
+    pixels.setPixelColor(4,255,i,0);
+    pixels.setPixelColor(5,255,i,0);
+    pixels.setPixelColor(6,255,i,0);
+    pixels.setPixelColor(7,255,i,0);
+    pixels.setPixelColor(8,255,i,0);
+    pixels.show();
+    delay(30);
+  }
+  
+  for(int i=60; i>0; i--) {
+    pixels.setPixelColor(1,255,i,0);
+    pixels.setPixelColor(2,255,i,0);
+    pixels.setPixelColor(3,255,i,0);
+    pixels.setPixelColor(4,255,i,0);
+    pixels.setPixelColor(5,255,i,0);
+    pixels.setPixelColor(6,255,i,0);
+    pixels.setPixelColor(7,255,i,0);
+    pixels.setPixelColor(8,255,i,0);
+    pixels.show();
+    delay(30);
+    
+  }
+
+  
+  return 0;
+}
+
+ // Función para apagar los Neopixels
+void shutDown() {
+  pixels.clear(); // Set all pixel colors to 'off'
+  pixels.show();   // Send the updated pixel colors to the hardware.
+  
+  delay(500);
+  return 0;
+}
+
+
+
 void loop(){
 
-//DateTime minuto_referencia;
-//DateTime diferencia_minuto;
-//DateTime t1;
+DateTime minuto_referencia;
 DateTime actual = tiempo_real();
+pixels.clear();
 
  // Condicional modo de control establecido desde pantalla
 if ((contador_horas - contador_horas_fin) == 0 && flag_modo == 3) {
@@ -289,41 +409,17 @@ if ((contador_horas - contador_horas_fin) == 0 && flag_modo == 3) {
   else if (actual.minute() >= contador_min_fin) {
     digitalWrite(rele,LOW);
   }
-  
-}
+ }
 
 // Modo de control preestablecido para hidroponía según curso
 else if (flag_modo == 2) {   // Modo riego 15 minutos cada hora
   if (contador_mod2 == 0) { // Si contador modo de riego 2 está en cero
-    minuto_referencia = actual.minute(); //Minuto de referencia para comparación
+    minuto_referencia = actual.minute(); //Minuto de referencia para futura comparación
     contador_mod2++;
   }
   else if (contador_mod2 != 0) {
-   if ( actual.hour() >=7 && actual.hour() < 11) {
-    if (actual.minute() >=0 && actual.minute() < 15) {
-     digitalWrite(rele,HIGH);
-     }
-    else if (actual.minute() >=15) {
-     digital.Write(rele,LOW);
-     }
-   }
-   else if (actual.hour()>= 11 && actual.hour() < 14) {
-    if (actual.minute() >=0 && actual.minute() <15) {
-     digitalWrite(rele,HIGH);
-     }
-    else if (actual.minute() >= 30 && actual.minute() < 45) {
-     digital.Write(rele,LOW);          
-    }
-    else if (actual.minute() >=45 && actual.minute() <=59) {
-     digital.Write(rele,HIGH);
-    }
-   }
+    hydroponicTest();                 // Función hidroponía
+    
   }
-} // Fin flag_modo2 
-
-else {
-  digitalWrite(rele,LOW);
-}
-
-
-}
+ }
+}      
