@@ -94,7 +94,7 @@ void setup () {
       lcd.setCursor(4,0);
       lcd.print("1.Bombeo");
       lcd.setCursor(3,1);
-      lcd.print("programado.");
+      lcd.print("cada hora.");
       flag_modo = 1;                                      // Bandera modo bombeo programado
       if (pulsador_select_state == false) {
         lcd.clear();
@@ -137,48 +137,48 @@ void setup () {
 }while (true); // Fin selección modo de riego
 
 
-// *>>>*Set de selección riego programado*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+// *>>>*Set de selección bombeo cada hora*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
  
   do{
-    int state_pul_hora = digitalRead(pulsador_hora);
+    //int state_pul_hora = digitalRead(pulsador_hora);
     int state_pul_min = digitalRead(pulsador_min);
     int state_pul_set = digitalRead(pulsador_set);
       
-  
+  /*
     if (state_pul_hora == false) {
       contador_horas++;
       if (contador_horas >23) {
         contador_horas = 0;
       }
       delay(200);
-    }
-    
-    else if (state_pul_min == false) {
+    } */
+   
+    if (state_pul_min == false) { // Configuración de duración de bombeo en minutos
       contador_min++;
       if (contador_min >59) {
         contador_min = 0;
       }
       delay(200);
-    }
+    } 
     
-    else if (state_pul_set == false) {
+    else if (state_pul_set == false) { // Salida
       flag_modo = 3;
       lcd.clear();
       delay(1000);
       break;
     }
     lcd.setCursor(0,0);
-    lcd.print("INICIO BOMBEO 1:");
-    lcd.setCursor(6,1);
-    lcd.print(contador_horas);
-    lcd.print(":");
+    lcd.print("DURACION BOMBEO:");
+    lcd.setCursor(3,1);
     lcd.print(contador_min);
+    lcd.print(" Minutos");
+    //lcd.print(contador_min);
   
   }while(flag_modo == 1);
 
 
 //*>>>Set de configuración FINAL DE RIEGO 1*<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-do{
+/*do{
   int state_pul_hora = digitalRead(pulsador_hora);
   int state_pul_min = digitalRead(pulsador_min);
   int state_pul_set = digitalRead(pulsador_set);
@@ -210,7 +210,7 @@ do{
   lcd.print(":");
   lcd.print(contador_min_fin);
   
-}while(flag_modo == 3);
+}while(flag_modo == 3); */
 
 lcd.clear();
 lcd.setCursor(4,0);
@@ -279,12 +279,13 @@ DateTime tiempo_real() {
    * 11:00AM - 14:00AM: Cilclos de bombeo alternados cada 15 minutos, "encendiendo la bomba desde el minuto 0"
    * 14:00PM - 17:00PM: CIclos de bombeo de 15 minutos cada hora, "comenzando desde el minuto 0" */
    
-void hydroponicTest() {
+void hydroponicTest2(int duracion_min ) { //duracion_min valor de referencia tomado de la variable "contador_min" 
   
   DateTime actual = RTC.now();                 // Obtiene la fecha y hora del RTC
-  
-  if ( actual.hour() >=7 && actual.hour() < 11) {                   // De las 7AM  a las 11AM
-    if (actual.minute() >=0 && actual.minute() < 15) {
+  int duracion_bombeo = duracion_min;
+ 
+  if ( actual.hour() >=0 && actual.hour() <= 23) {                     // De las 1AM  a las 23PM
+    if (actual.minute() >=0 && actual.minute() < duracion_bombeo) {   // Minuto desde cero hasta variable seleccionada duracion_bombeo
       digitalWrite(rele,HIGH);
       lcd.setCursor(4,0);
       lcd.print("Bombeando");
@@ -293,11 +294,12 @@ void hydroponicTest() {
       delay(1000);
       naranja();
      }
-    else if (actual.minute() >=15) {
+    else if (actual.minute() >= duracion_bombeo) {
      digitalWrite(rele,LOW);
      shutDown();
      }
    }
+ /*
   else if (actual.hour()>= 11 && actual.hour() < 14) {            // De las 11AM  a las 14PM Falto el rango desde las 11:15 a las 11:30 LOW  
     if (actual.minute() >=0 && actual.minute() <15) {
      digitalWrite(rele,HIGH);
@@ -341,9 +343,9 @@ void hydroponicTest() {
       shutDown(); 
     }
     
-   }                                                             // Fin ciclo de la tarde hasta las 17PM
+   } */                                                            // Fin ciclo de la tarde hasta las 17PM
    
-  else if (actual.hour() >21 ) {                                // Apaga la bomba despues de las 17PM
+  else if (actual.hour() >23 ) {                                // Apaga la bomba despues de las 17PM
     digitalWrite(rele,LOW);         
    }
    
@@ -401,25 +403,43 @@ DateTime minuto_referencia;
 DateTime actual = tiempo_real();
 pixels.clear();
 
- // Condicional modo de control establecido desde pantalla
-if ((contador_horas - contador_horas_fin) == 0 && flag_modo == 3) {
+ // Condicional modo de control establecido desde pantalla 
+/*
+ if ((contador_horas - contador_horas_fin) == 0 && flag_modo == 2) {
   if (actual.minute() >= contador_min && actual.minute() < contador_min_fin) {
     digitalWrite(rele,HIGH);
   }
   else if (actual.minute() >= contador_min_fin) {
     digitalWrite(rele,LOW);
   }
- }
+ } */
 
-// Modo de control preestablecido para hidroponía según curso
-else if (flag_modo == 2) {   // Modo riego 15 minutos cada hora
+// Modo de control preestablecido para bombeo cada hora con duración selecciónada por el usuario en pantalla
+if (flag_modo == 3) {   // Modo riego 15 minutos cada hora
   if (contador_mod2 == 0) { // Si contador modo de riego 2 está en cero
     minuto_referencia = actual.minute(); //Minuto de referencia para futura comparación
     contador_mod2++;
   }
   else if (contador_mod2 != 0) {
-    hydroponicTest();                 // Función hidroponía
+    hydroponicTest2(contador_min);                 // Función hidroponía
     
   }
+ } // fin if
+ 
+ else if (flag_modo == 2) {
+  lcd.setCursor(4,0);
+  lcd.print("Modo.....")
+  lcd.setCursor(0,1);
+  lcd.print(" en Construccion");
+  delay(1000);
+ }
+ 
+ else {                        // Modo error
+  lcd.setCursor(4,0);
+  lcd.print("Error... ")
+  lcd.setCursor(0,1);
+  lcd.print(" Favor reiniciar");
+  delay(1000);
  }
 }      
+
