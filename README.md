@@ -1,7 +1,8 @@
 # Hydroponics_tech
-A project that allows control a pump by setting a timer in a hydroponic system with the Nutrient Film Technique.
+
+The whole idea for this project it´s to prototype and build a 12 plant hydroponic system with common and cheap or recycled elements that allows people grow food in their houses and be able to experiment with this particular hydroponic method.
     
-   Description: 
+   Technical Description: 
   * This sketch allows the user to select between several default time modes for
   * the drive of the motor pump, in a hydroponic system. Interacts with the arduino driver hardware
   * nano CH340, lcd I2C 16x2 and the clock module RTC DS3231. Modified part of the code "Time Clock Test
