@@ -1,5 +1,5 @@
 # Hydroponics_tech
-*C++ sketch that allows control a pump by setting a timer in a hydroponic system with the Nutrient Film Technique.
+A project that allows control a pump by setting a timer in a hydroponic system with the Nutrient Film Technique.
     
    Description: 
   * This sketch allows the user to select between several default time modes for
