@@ -26,3 +26,4 @@ General View of the final system:
 
 First version of the hydroponic system v.10 in action: 
 <div><img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hydroponic2.gif" alt="GIF" height="400"></div>
+<div><img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hydroponic.gif" alt="GIF" height="400"></div>
