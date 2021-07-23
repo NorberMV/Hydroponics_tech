@@ -15,3 +15,6 @@ The Hardware PCB was designed in Eagle 9.4.2, and the gerber files are attached 
 # The Schematic:
 ![Schematic_Hydroponic](Schematic_Hydroponic.png) 
 
+# Pictures:
+
+<img src="Hydroponics_tech/blob/master/hidrophonicSys.jpg" alt="My Project GIF" width="500" height="600">
