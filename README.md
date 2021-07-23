@@ -17,12 +17,12 @@ The Hardware PCB was designed in Eagle 9.4.2, and the gerber files are attached 
 
 # Pictures:
 The circuit prototype:
-<div margin-top: 
-4em; 
-margin-bottom: 2em;><img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hidrophonicSys.jpg" alt="My Project GIF" height="200"></div>
+<div><img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hidrophonicSys.jpg" alt="My Project GIF" height="200"></div>
+
 
 General View of the final system:
 <div><img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hidrophonicSystem.jpg" alt="My Project GIF" height="400"></div>
+
 
 First version of the hydroponic system v.10 in action: 
 <div><img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hydroponic2.gif" alt="GIF" height="400"></div>
