@@ -20,4 +20,4 @@ The Hardware PCB was designed in Eagle 9.4.2, and the gerber files are attached 
 <img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hidrophonicSys.jpg" alt="My Project GIF" height="400">
 
 
-<img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hydrophonic2.gif" alt="GIF" height="400">
+<img src="https://github.com/NorberMV/Hydroponics_tech/blob/master/hydroponic2.gif" alt="GIF" height="400">
